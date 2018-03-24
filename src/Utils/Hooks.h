@@ -1,6 +1,6 @@
-// TortoiseGit - a Windows shell extension for easy version control
+﻿// TortoiseGit - a Windows shell extension for easy version control
 
-// Copyright (C) 2011-2017 - TortoiseGit
+// Copyright (C) 2011-2018 - TortoiseGit
 // Copyright (C) 2006-2008, 2015 - TortoiseSVN
 
 // This program is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@
 #pragma once
 #include "registry.h"
 #include "TGitPath.h"
+#include "ProjectProperties.h"
 
 /**
  * \ingroup TortoiseProc
@@ -68,6 +69,7 @@ typedef struct hookcmd
 	bool			bWait;
 	bool			bShow;
 	bool			bEnabled;
+	bool			bLocal;
 } hookcmd;
 
 typedef std::map<hookkey, hookcmd>::iterator hookiterator;
@@ -111,7 +113,7 @@ public:
 	 * Adds a new hook script. To make the change persistent, call Save().
 	 */
 	void				Add(hooktype ht, const CTGitPath& Path, LPCTSTR szCmd,
-							bool bWait, bool bShow, bool bEnabled);
+							bool bWait, bool bShow, bool bEnabled, bool bLocal);
 
 	/**
 	* Toggles the hook script identified by \c key. Returns whether the status has changed.
@@ -123,6 +125,9 @@ public:
 	static CString		GetHookTypeString(hooktype t);
 	/// returns the hooktype from a string representation of the same.
 	static hooktype		GetHookType(const CString& s);
+
+	/// Add hook script data from project properties
+	void				SetProjectProperties(const CTGitPath& Path, const ProjectProperties& pp);
 
 	/**
 	 * Executes the Start-Commit-Hook that first matches the path in
@@ -190,5 +195,8 @@ private:
 	 * path in \c workingTree.
 	 */
 	const_hookiterator	FindItem(hooktype t, const CString& workingTree) const;
+	static bool ParseHookString(CString strhooks, bool bLocal);
+
 	static CHooks *		m_pInstance;
+	static CTGitPath	m_RootPath;
 };
